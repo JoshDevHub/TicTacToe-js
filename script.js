@@ -1,3 +1,5 @@
+"use strict";
+
 // factory for tic tac toe board
 const GameBoard = () => {
   const SIZE = 3;
