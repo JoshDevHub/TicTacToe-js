@@ -1,0 +1,8 @@
+.row {
+  display: flex;
+}
+
+.square {
+  border: solid 2px black;
+  padding: 1rem;
+}
