@@ -76,7 +76,7 @@ const TicTacToe = () => {
   const player2 = Player("O");
   let currentPlayer = player1;
 
-  const getCurrentPlayer = () => currentPlayer;
+  const getCurrentPlayer = () => currentPlayer.getSymbol();
 
   const getBoardData = () => board.getData();
 
@@ -84,17 +84,80 @@ const TicTacToe = () => {
     currentPlayer = currentPlayer === player1 ? player2 : player1;
   }
 
-  const makeMove = (player, position) => {
-    board.placeSymbol(player.getSymbol(), position);
+  const makeMove = (position) => {
+    if (board.isPositionAvailable(position)) {
+      const currentSymbol = currentPlayer.getSymbol();
+      board.placeSymbol(currentSymbol, position);
+      if (isGameOver()) return;
+
+      changeTurns();
+    }
   }
 
-  const isWinner = () => {
-    return board.hasThreeInRow();
-  }
-
-  const isDraw = () => {
-    return board.isFull();
-  }
+  const isWinner = () => board.hasThreeInRow();
+  const isDraw = () => board.isFull();
+  const isGameOver = () => isWinner() || isDraw();
 
   return { getCurrentPlayer, getBoardData, changeTurns, makeMove, isWinner, isDraw };
 }
+
+const Display = (actions) => {
+  const grid = document.getElementById("grid");
+  const resultsContainer = document.getElementById("results")
+  const { move, getData, isWinner, getCurrentPlayer } = actions;
+
+  const squareClickHandler = (event) => {
+    const row = event.target.parentNode.getAttribute("data-row")
+    const col = event.target.getAttribute("data-col");
+    if (!row || !col) return;
+
+    move([row, col]);
+    renderGrid(getData());
+    if (isWinner()) {
+      renderGameOver();
+    }
+  }
+
+  grid.addEventListener("click", squareClickHandler);
+
+  const renderGameOver = () => {
+    grid.removeEventListener("click", squareClickHandler);
+    resultsContainer.textContent = `${getCurrentPlayer()} has won the game!`;
+  };
+
+  const renderGrid = (modelData) => {
+    grid.replaceChildren();
+
+    modelData.forEach(createRow);
+  }
+
+  const createRow = (rowData, rowNum) => {
+    const template = document.getElementById("row-template")
+    const clone = template.content.cloneNode(true);
+
+    const row = clone.querySelector('div');
+
+    rowData.forEach((position, index) => {
+      const square = row.querySelector(`[data-col='${index}']`);
+      console.log(square === "X");
+      square.textContent = position;
+    });
+    row.setAttribute("data-row", rowNum);
+    grid.appendChild(clone);
+  }
+
+  return { renderGrid }
+}
+
+const controller = (() => {
+  const model = TicTacToe();
+  const actions = {
+    move: model.makeMove,
+    getData: model.getBoardData,
+    isWinner: model.isWinner,
+    getCurrentPlayer: model.getCurrentPlayer
+  }
+  const view = Display(actions);
+
+  view.renderGrid(model.getBoardData());
+})();
