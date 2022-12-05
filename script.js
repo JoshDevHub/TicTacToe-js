@@ -52,9 +52,9 @@ const GameBoard = () => {
 
 // Player Factory
 const Player = (symbol) => {
-  const symbol = symbol;
+  const playerSymbol = symbol;
 
-  const getSymbol = () => symbol;
+  const getSymbol = () => playerSymbol;
 
   return { getSymbol };
 }
