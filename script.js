@@ -28,6 +28,10 @@ const GameBoard = () => {
     })
   }
 
+  const isFull = () => {
+    return data.every((row) => row.every((position) => position !== ""));
+  }
+
   // private helpers
   const isInvalidPosition = (row, col) => {
     return row < 0 && SIZE >= row && col < 0 && SIZE >= col
@@ -43,7 +47,7 @@ const GameBoard = () => {
     return [main, anti];
   }
 
-  return { getPosition, placeSymbol, hasThreeInRow };
+  return { getPosition, placeSymbol, hasThreeInRow, isFull };
 };
 
 // Player Factory
