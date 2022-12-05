@@ -46,3 +46,11 @@ const GameBoard = () => {
   return { getPosition, placeSymbol, hasThreeInRow };
 };
 
+// Player Factory
+const Player = (symbol) => {
+  const symbol = symbol;
+
+  const getSymbol = () => symbol;
+
+  return { getSymbol };
+}
