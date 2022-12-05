@@ -58,3 +58,30 @@ const Player = (symbol) => {
 
   return { getSymbol };
 }
+
+const TicTacToe = () => {
+  const board = GameBoard();
+  const player1 = Player("X");
+  const player2 = Player("O");
+  let currentPlayer = player1;
+
+  const getCurrentPlayer = () => currentPlayer;
+
+  const changeTurns = () => {
+    currentPlayer = currentPlayer === player1 ? player2 : player1;
+  }
+
+  const makeMove = (player, position) => {
+    board.placeSymbol(player.getSymbol(), position);
+  }
+
+  const isWinner = () => {
+    return board.hasThreeInRow();
+  }
+
+  const isDraw = () => {
+    return board.isFull();
+  }
+
+  return { getCurrentPlayer, changeTurns, makeMove, isWinner, isDraw };
+}
