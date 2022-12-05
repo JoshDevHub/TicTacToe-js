@@ -15,6 +15,13 @@ const GameBoard = () => {
     return data[row][col];
   }
 
+  const isPositionAvailable = (position) => {
+    const [row, col] = position;
+    if (isInvalidPosition(row, col)) return false;
+
+    return data[row][col] === "";
+  }
+
   const placeSymbol = (symbol, position) => {
     const [row, col] = position;
     if (isInvalidPosition(row, col)) return;
@@ -51,7 +58,7 @@ const GameBoard = () => {
     return [main, anti];
   }
 
-  return { getData, getPosition, placeSymbol, hasThreeInRow, isFull };
+  return { getData, getPosition, placeSymbol, hasThreeInRow, isFull, isPositionAvailable };
 };
 
 // Player Factory
