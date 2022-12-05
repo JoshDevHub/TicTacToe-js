@@ -4,6 +4,8 @@ const GameBoard = () => {
 
   const data = Array(SIZE).fill(null).map(() => Array(SIZE).fill(""));
 
+  const getData = () => [...data];
+
   const getPosition = (position) => {
     const [row, col] = position;
     if (isInvalidPosition(row, col)) return;
@@ -47,7 +49,7 @@ const GameBoard = () => {
     return [main, anti];
   }
 
-  return { getPosition, placeSymbol, hasThreeInRow, isFull };
+  return { getData, getPosition, placeSymbol, hasThreeInRow, isFull };
 };
 
 // Player Factory
@@ -67,6 +69,8 @@ const TicTacToe = () => {
 
   const getCurrentPlayer = () => currentPlayer;
 
+  const getBoardData = () => board.getData();
+
   const changeTurns = () => {
     currentPlayer = currentPlayer === player1 ? player2 : player1;
   }
@@ -83,5 +87,5 @@ const TicTacToe = () => {
     return board.isFull();
   }
 
-  return { getCurrentPlayer, changeTurns, makeMove, isWinner, isDraw };
+  return { getCurrentPlayer, getBoardData, changeTurns, makeMove, isWinner, isDraw };
 }
