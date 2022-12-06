@@ -96,12 +96,11 @@ const TicTacToe = (pubSub) => {
   const isDraw = () => board.isFull();
   const isGameOver = () => isWinner() || isDraw();
 
-  const checkGameOver = () => {
-    if (isWinner()) {
-      pubSub.publish('gameOver', getCurrentSymbol());
-    } else if (isDraw()) {
-      pubSub.publish('gameOver', null);
-    }
+  const broadcastGameOver = () => {
+    if (!isGameOver()) return;
+
+    const winner = isWinner() ? getCurrentSymbol() : null;
+    pubSub.publish('gameOver', winner);
   }
 
   const resetGame = () => {
@@ -110,8 +109,7 @@ const TicTacToe = (pubSub) => {
     pubSub.publish('boardUpdated', board.getData());
   }
 
-  pubSub.subscribe('makeMove', makeMove);
-  pubSub.subscribe('makeMove', checkGameOver);
+  pubSub.subscribe('makeMove', makeMove, broadcastGameOver);
   pubSub.subscribe('newGame', resetGame);
   return { getBoardData };
 }
