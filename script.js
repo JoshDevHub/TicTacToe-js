@@ -70,7 +70,7 @@ const Player = (symbol) => {
   return { getSymbol };
 }
 
-const TicTacToe = () => {
+const TicTacToe = (pubSub) => {
   const board = GameBoard();
   const player1 = Player("X");
   const player2 = Player("O");
@@ -91,6 +91,13 @@ const TicTacToe = () => {
       if (isGameOver()) return;
 
       changeTurns();
+      pubSub.publish('moveExecuted', board.getData());
+    }
+  }
+
+  const isWinner = () => {
+    if (board.hasThreeInRow()) {
+      pubSub.publish('winEvent', getCurrentPlayer());
     }
   }
 
@@ -98,10 +105,11 @@ const TicTacToe = () => {
   const isDraw = () => board.isFull();
   const isGameOver = () => isWinner() || isDraw();
 
-  return { getCurrentPlayer, getBoardData, changeTurns, makeMove, isWinner, isDraw };
+  pubSub.subscribe('makeMove', makeMove);
+  return { getCurrentPlayer, getBoardData, isDraw };
 }
 
-const Display = (actions) => {
+const Display = (pubSub) => {
   const grid = document.getElementById("grid");
   const resultsContainer = document.getElementById("results")
   const { move, getData, isWinner, getCurrentPlayer } = actions;
@@ -111,11 +119,7 @@ const Display = (actions) => {
     const col = event.target.getAttribute("data-col");
     if (!row || !col) return;
 
-    move([row, col]);
-    renderGrid(getData());
-    if (isWinner()) {
-      renderGameOver();
-    }
+    pubSub.publish('makeMove', [row, col]);
   }
 
   grid.addEventListener("click", squareClickHandler);
@@ -150,14 +154,25 @@ const Display = (actions) => {
 }
 
 const controller = (() => {
-  const model = TicTacToe();
-  const actions = {
-    move: model.makeMove,
-    getData: model.getBoardData,
-    isWinner: model.isWinner,
-    getCurrentPlayer: model.getCurrentPlayer
-  }
-  const view = Display(actions);
+  const pubSub = (() => {
+    const events = [];
+
+    const subscribe = (eventName, action) => {
+      events[eventName] = events[eventName] || [];
+      events[eventName].push(action);
+    }
+
+    const publish = (eventName, data) => {
+      if (events[eventName]) {
+        events[eventName].forEach((fn) => fn(data));
+      }
+    }
+
+    return { subscribe, publish };
+  })();
+
+  const model = TicTacToe(pubSub);
+  const view = Display(pubSub);
 
   view.renderGrid(model.getBoardData());
 })();
