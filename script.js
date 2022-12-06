@@ -186,9 +186,9 @@ const controller = (() => {
   const pubSub = (() => {
     const events = [];
 
-    const subscribe = (eventName, action) => {
+    const subscribe = (eventName, ...actions) => {
       events[eventName] = events[eventName] || [];
-      events[eventName].push(action);
+      actions.forEach((action) => events[eventName].push(action));
     }
 
     const publish = (eventName, data) => {
