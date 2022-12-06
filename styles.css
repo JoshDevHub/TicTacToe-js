@@ -3,6 +3,36 @@
 }
 
 .square {
+  align-items: center;
   border: solid 2px black;
-  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.modal-overlay {
+  background-color: hsla(0, 0%, 0%, 0.6);
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 50;
+}
+
+.modal-box {
+  background-color: gray;
+  border-radius: 5px;
+  left: 50%;
+  min-width: 50%;
+  padding: 3rem;
+  position: fixed;
+  text-align: center;
+  transform: translateX(-50%);
+  z-index: 100;
+}
+
+.closed {
+  display: none;
 }
