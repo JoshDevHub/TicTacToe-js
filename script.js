@@ -64,8 +64,12 @@ const GameBoard = () => {
 // Player Factory
 const Player = (symbol) => {
   const playerSymbol = symbol;
+  let name;
+
   const getSymbol = () => playerSymbol;
-  return { getSymbol };
+  const getName = () => name;
+  const setName = (newName) => name = newName;
+  return { getSymbol, getName, setName };
 }
 
 const TicTacToe = (pubSub) => {
@@ -85,7 +89,7 @@ const TicTacToe = (pubSub) => {
   const makeMove = (position) => {
     if (board.isPositionAvailable(position)) {
       board.placeSymbol(getCurrentSymbol(), position);
-      pubSub.publish('boardUpdated', board.getData());
+      pubSub.publish('gameUpdated', board.getData());
       if (isGameOver()) return;
 
       changeTurns();
@@ -99,16 +103,23 @@ const TicTacToe = (pubSub) => {
   const broadcastGameOver = () => {
     if (!isGameOver()) return;
 
-    const winner = isWinner() ? getCurrentSymbol() : null;
+    const winner = isWinner() ? currentPlayer.getName() : null;
     pubSub.publish('gameOver', winner);
   }
 
   const resetGame = () => {
     board = GameBoard();
     currentPlayer = player1;
-    pubSub.publish('boardUpdated', board.getData());
+    pubSub.publish('gameUpdated', board.getData());
   }
 
+  const setupGame = (playerNames) => {
+    player1.setName(playerNames.player1);
+    player2.setName(playerNames.player2);
+    pubSub.publish('gameUpdated', board.getData());
+  }
+
+  pubSub.subscribe('setupGame', setupGame);
   pubSub.subscribe('makeMove', makeMove, broadcastGameOver);
   pubSub.subscribe('newGame', resetGame);
   return { getBoardData };
@@ -174,10 +185,25 @@ const Display = (pubSub) => {
       .forEach((node) => node.classList.toggle('closed'));
   }
 
-  pubSub.subscribe('boardUpdated', renderGrid);
+  const renderPlayerSelect = () => {
+    const template = document.getElementById("name-form");
+    const clone = template.content.cloneNode(true);
+
+    const button = clone.querySelector('button');
+    button.addEventListener("click", () => {
+      const form = document.body.querySelector('form');
+      const player1 = document.getElementById("player1").value;
+      const player2 = document.getElementById("player2").value;
+      document.body.removeChild(form);
+      pubSub.publish("setupGame", { player1, player2 });
+    })
+    document.body.appendChild(clone);
+  }
+
+  pubSub.subscribe('gameUpdated', renderGrid);
   pubSub.subscribe('gameOver', renderGameOver);
 
-  return { renderGrid, addPlayAgainListener }
+  return { addPlayAgainListener, renderPlayerSelect }
 }
 
 const controller = (() => {
@@ -196,9 +222,9 @@ const controller = (() => {
     return { subscribe, publish };
   })();
 
-  const model = TicTacToe(pubSub);
+  TicTacToe(pubSub);
   const view = Display(pubSub);
 
-  view.renderGrid(model.getBoardData());
+  view.renderPlayerSelect();
   view.addPlayAgainListener();
 })();
