@@ -202,7 +202,7 @@ const Display = (eventManager) => {
 
 const controller = (() => {
   const pubSub = (() => {
-    const events = [];
+    const events = {};
 
     const subscribe = (eventName, ...actions) => {
       events[eventName] = events[eventName] || [];
