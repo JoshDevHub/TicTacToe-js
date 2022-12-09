@@ -51,15 +51,22 @@ form button {
   padding: 0.5em;
 }
 
+#grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .row {
   display: flex;
+  gap: 2px;
   justify-content: center;
 }
 
 .square {
   align-items: center;
   background-color: hsl(225, 27%, 51%);
-  border: solid 2px black;
+  border: solid 1px black;
   display: flex;
   flex-direction: column;
   justify-content: center;
