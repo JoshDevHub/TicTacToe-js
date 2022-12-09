@@ -11,6 +11,34 @@ h1 {
   text-align: center;
 }
 
+form {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0 auto;
+  max-width: 60%;
+}
+
+fieldset {
+  border: none;
+  display: flex;
+  flex-direction: column;
+}
+
+form label {
+  letter-spacing: 1px;
+}
+
+form input {
+  padding: 0.5rem;
+}
+
+form button {
+  font-size: 1rem;
+  padding: 0.5em;
+}
+
 .row {
   display: flex;
   justify-content: center;
