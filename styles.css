@@ -5,6 +5,7 @@
 :root {
   --background-left-gradient: #5DE6DE;
   --background-right-gradient: #B58ECC;
+  --grid-color: hsla(220, 16%, 22%, 0.8);
   --x-color: hsl(225, 27%, 51%);
 }
 
@@ -51,10 +52,26 @@ form button {
   padding: 0.5em;
 }
 
-#grid {
+.grid {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.grid .row:first-child .square:first-child {
+  border-top-left-radius: 6px;
+}
+
+.grid .row:first-child .square:last-child {
+  border-top-right-radius: 6px;
+}
+
+.grid .row:last-child .square:first-child {
+  border-bottom-left-radius: 6px;
+}
+
+.grid .row:last-child .square:last-child {
+  border-bottom-right-radius: 6px;
 }
 
 .row {
@@ -65,7 +82,7 @@ form button {
 
 .square {
   align-items: center;
-  background-color: hsl(225, 27%, 51%);
+  background-color: var(--grid-color);
   border: solid 1px black;
   display: flex;
   flex-direction: column;
