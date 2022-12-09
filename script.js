@@ -125,6 +125,7 @@ const TicTacToe = (eventManager) => {
 const Display = (eventManager) => {
   const grid = document.getElementById("grid");
   const resultsContainer = document.getElementById("results")
+  const symbolClassMap = new Map([["X", "x-symbol"], ["O", "o-symbol"]]);
 
   const squareClickHandler = (event) => {
     const row = event.target.parentNode.getAttribute("data-row")
@@ -170,7 +171,7 @@ const Display = (eventManager) => {
 
     rowData.forEach((position, index) => {
       const square = row.querySelector(`[data-col='${index}']`);
-      square.textContent = position;
+      square.classList.add(symbolClassMap.get(position));
     });
     row.setAttribute("data-row", rowNum);
     grid.appendChild(clone);
