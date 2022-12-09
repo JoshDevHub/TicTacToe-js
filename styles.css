@@ -1,5 +1,19 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+
+h1 {
+  text-align: center;
+}
+
 .row {
   display: flex;
+  justify-content: center;
 }
 
 .square {
@@ -7,8 +21,8 @@
   border: solid 2px black;
   display: flex;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 100px;
+  height: 100px;
 }
 
 .modal-overlay {
