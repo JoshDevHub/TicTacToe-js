@@ -1,14 +1,5 @@
 "use strict";
 
-const Event = () => {
-  const listeners = [];
-
-  const addListener = (listener) => listeners.push(listener);
-  const activate = (params) => listeners.forEach((listener) => listener(params))
-
-  return { addListener, activate };
-}
-
 // factory for tic tac toe board
 const GameBoard = () => {
   const SIZE = 3;
