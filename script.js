@@ -1,5 +1,14 @@
 "use strict";
 
+const Event = () => {
+  const listeners = [];
+
+  const addListener = (listener) => listeners.push(listener);
+  const activate = (params) => listeners.forEach((listener) => listener(params))
+
+  return { addListener, activate };
+}
+
 // factory for tic tac toe board
 const GameBoard = () => {
   const SIZE = 3;
@@ -124,8 +133,15 @@ const TicTacToe = (eventManager) => {
 
 const Display = (eventManager) => {
   const grid = document.getElementById("grid");
-  const resultsContainer = document.getElementById("results")
+  const resultsContainer = document.getElementById("results");
+  const rowTemplate = document.getElementById("row-template");
   const symbolClassMap = new Map([["X", "x-symbol"], ["O", "o-symbol"]]);
+
+  const replayButton = document.querySelector("button");
+  replayButton.addEventListener("click", () => {
+    eventManager.publish("newGame");
+    toggleModal();
+  })
 
   const squareClickHandler = (event) => {
     const row = event.target.parentNode.getAttribute("data-row")
@@ -149,14 +165,6 @@ const Display = (eventManager) => {
     toggleModal();
   };
 
-  const addPlayAgainListener = () => {
-    const replayButton = document.querySelector("button");
-    replayButton.addEventListener("click", () => {
-      eventManager.publish("newGame");
-      toggleModal();
-    })
-  }
-
   const renderGrid = (modelData) => {
     grid.replaceChildren();
 
@@ -164,9 +172,7 @@ const Display = (eventManager) => {
   }
 
   const createRow = (rowData, rowNum) => {
-    const template = document.getElementById("row-template")
-    const clone = template.content.cloneNode(true);
-
+    const clone = rowTemplate.content.cloneNode(true);
     const row = clone.querySelector('div');
 
     rowData.forEach((position, index) => {
@@ -198,7 +204,7 @@ const Display = (eventManager) => {
     document.body.appendChild(clone);
   }
 
-  return { addPlayAgainListener, renderPlayerSelect, renderGrid, renderGameOver }
+  return { renderPlayerSelect, renderGrid, renderGameOver }
 }
 
 const controller = (() => {
@@ -228,5 +234,4 @@ const controller = (() => {
   pubSub.subscribe('gameOver', view.renderGameOver);
 
   view.renderPlayerSelect();
-  view.addPlayAgainListener();
 })();
