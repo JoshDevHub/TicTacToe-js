@@ -71,20 +71,44 @@ const GameBoard = () => {
 };
 
 // Player Factory
-const Player = (symbol) => {
+const HumanPlayer = (symbol) => {
   const playerSymbol = symbol;
   let name;
 
   const getSymbol = () => playerSymbol;
   const getName = () => name;
   const setName = (newName) => name = newName;
-  return { getSymbol, getName, setName };
+  const getAutomatedMove = () => [-1, -1];
+
+  return { getSymbol, getName, setName, getAutomatedMove };
+}
+
+const ComputerPlayer = (symbol) => {
+  const playerSymbol = symbol;
+  const name = "BeepBoop";
+
+  const getSymbol = () => playerSymbol;
+  const getName = () => name;
+  const setName = () => {};
+
+  const getAutomatedMove = (boardData) => {
+    const possibilities = [];
+    boardData.forEach((row, rowIdx) => {
+      row.forEach((col, colIdx) => {
+        if (col === "") possibilities.push([rowIdx, colIdx]);
+      })
+    })
+    const randomIdx = Math.floor(Math.random() * possibilities.length);
+    return possibilities[randomIdx];
+  }
+
+  return { getSymbol, getName, setName, getAutomatedMove };
 }
 
 const TicTacToe = (eventManager) => {
   let board = GameBoard();
-  const player1 = Player("X");
-  const player2 = Player("O");
+  const player1 = HumanPlayer("X");
+  const player2 = ComputerPlayer("O");
   let currentPlayer = player1;
 
   const getCurrentSymbol = () => currentPlayer.getSymbol();
@@ -102,6 +126,7 @@ const TicTacToe = (eventManager) => {
       if (isGameOver()) return;
 
       changeTurns();
+      makeMove(currentPlayer.getAutomatedMove(getBoardData()));
     }
   }
 
