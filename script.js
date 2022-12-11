@@ -1,5 +1,20 @@
 "use strict";
 
+const pubSub = (() => {
+  const events = {};
+
+  const subscribe = (eventName, ...actions) => {
+    events[eventName] = events[eventName] || [];
+    actions.forEach((action) => events[eventName].push(action));
+  }
+
+  const publish = (eventName, data) => {
+    events[eventName]?.forEach((fn) => fn(data));
+  }
+
+  return { subscribe, publish };
+})();
+
 // factory for tic tac toe board
 const GameBoard = () => {
   const SIZE = 3;
@@ -96,7 +111,7 @@ const ComputerPlayer = (symbol) => {
   return { getSymbol, getName, setName, getAutomatedMove };
 }
 
-const TicTacToe = (eventManager) => {
+const TicTacToe = () => {
   let board = GameBoard();
   const player1 = HumanPlayer("X");
   const player2 = ComputerPlayer("O");
@@ -113,11 +128,11 @@ const TicTacToe = (eventManager) => {
   const makeMove = (position) => {
     if (board.isPositionAvailable(position)) {
       board.placeSymbol(getCurrentSymbol(), position);
-      eventManager.publish('gameUpdated', board.getData());
+      pubSub.publish("gameUpdated", board.getData());
       if (isGameOver()) return;
 
       changeTurns();
-      makeMove(currentPlayer.getAutomatedMove(getBoardData()));
+      makeMove(currentPlayer.getAutomatedMove(board));
     }
   }
 
@@ -129,25 +144,25 @@ const TicTacToe = (eventManager) => {
     if (!isGameOver()) return;
 
     const winner = isWinner() ? currentPlayer.getName() : null;
-    eventManager.publish('gameOver', winner);
+    pubSub.publish("gameOver", winner);
   }
 
   const resetGame = () => {
     board = GameBoard();
     currentPlayer = player1;
-    eventManager.publish('gameUpdated', board.getData());
+    pubSub.publish("gameUpdated", board.getData());
   }
 
   const setupGame = (playerNames) => {
     player1.setName(playerNames.player1);
     player2.setName(playerNames.player2);
-    eventManager.publish('gameUpdated', board.getData());
+    pubSub.publish("gameUpdated", board.getData());
   }
 
   return { getBoardData, broadcastGameOver, resetGame, setupGame, makeMove };
 }
 
-const Display = (eventManager) => {
+const Display = () => {
   const grid = document.getElementById("grid");
   const resultsContainer = document.getElementById("results");
   const rowTemplate = document.getElementById("row-template");
@@ -155,7 +170,7 @@ const Display = (eventManager) => {
 
   const replayButton = document.querySelector("button");
   replayButton.addEventListener("click", () => {
-    eventManager.publish("newGame");
+    pubSub.publish("newGame");
     toggleModal();
   })
 
@@ -164,7 +179,7 @@ const Display = (eventManager) => {
     const col = event.target.getAttribute("data-col");
     if (!row || !col) return;
 
-    eventManager.publish('makeMove', [row, col]);
+    pubSub.publish("makeMove", [row, col]);
   }
 
   grid.addEventListener("click", squareClickHandler);
@@ -189,7 +204,7 @@ const Display = (eventManager) => {
 
   const createRow = (rowData, rowNum) => {
     const clone = rowTemplate.content.cloneNode(true);
-    const row = clone.querySelector('div');
+    const row = clone.querySelector("div");
 
     rowData.forEach((position, index) => {
       const square = row.querySelector(`[data-col='${index}']`);
@@ -202,20 +217,20 @@ const Display = (eventManager) => {
   const toggleModal = () => {
     document
       .querySelectorAll("[data-toggle='closed']")
-      .forEach((node) => node.classList.toggle('closed'));
+      .forEach((node) => node.classList.toggle("closed"));
   }
 
   const renderPlayerSelect = () => {
     const template = document.getElementById("name-form");
     const clone = template.content.cloneNode(true);
 
-    const button = clone.querySelector('button');
+    const button = clone.querySelector("button");
     button.addEventListener("click", () => {
-      const form = document.body.querySelector('form');
+      const form = document.body.querySelector("form");
       const player1 = document.getElementById("player1").value;
       const player2 = document.getElementById("player2").value;
       document.body.removeChild(form);
-      eventManager.publish("setupGame", { player1, player2 });
+      pubSub.publish("setupGame", { player1, player2 });
     })
     document.body.appendChild(clone);
   }
@@ -224,30 +239,21 @@ const Display = (eventManager) => {
 }
 
 const controller = (() => {
-  const pubSub = (() => {
-    const events = {};
+  const init = () => {
+    const model = TicTacToe();
+    const view = Display();
 
-    const subscribe = (eventName, ...actions) => {
-      events[eventName] = events[eventName] || [];
-      actions.forEach((action) => events[eventName].push(action));
-    }
+    pubSub.subscribe("setupGame", model.setupGame);
+    pubSub.subscribe("makeMove", model.makeMove, model.broadcastGameOver)
+    pubSub.subscribe("newGame", model.resetGame);
 
-    const publish = (eventName, data) => {
-      events[eventName]?.forEach((fn) => fn(data));
-    }
+    pubSub.subscribe("gameUpdated", view.renderGrid);
+    pubSub.subscribe("gameOver", view.renderGameOver);
 
-    return { subscribe, publish };
-  })();
+    view.renderPlayerSelect();
+  }
 
-  const model =TicTacToe(pubSub);
-  const view = Display(pubSub);
-
-  pubSub.subscribe('setupGame', model.setupGame);
-  pubSub.subscribe('makeMove', model.makeMove, model.broadcastGameOver);
-  pubSub.subscribe('newGame', model.resetGame);
-
-  pubSub.subscribe('gameUpdated', view.renderGrid);
-  pubSub.subscribe('gameOver', view.renderGameOver);
-
-  view.renderPlayerSelect();
+  return { init };
 })();
+
+controller.init();
