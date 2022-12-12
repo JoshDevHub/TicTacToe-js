@@ -105,15 +105,30 @@ const ComputerPlayer = (symbol) => {
   const getName = () => name;
   const setName = () => {};
 
-  const getAutomatedMove = (boardData) => {
-    const possibilities = [];
-    boardData.forEach((row, rowIdx) => {
-      row.forEach((col, colIdx) => {
-        if (col === "") possibilities.push([rowIdx, colIdx]);
-      })
+  const getAutomatedMove = (board) => {
+    return minimax(board, getSymbol()).move;
+  }
+
+  const minimax = (board, currentPlayer) => {
+    if (board.hasThreeInRow(playerSymbol)) return { score: -1, move: null };
+    if (board.hasThreeInRow()) return { score: 1, move: null };
+
+    if (board.isFull()) return { score: 0, move: null };
+
+    const possibleMoves = board.getEmptyPositions();
+    const results = possibleMoves.map((move) => {
+      const copy = board.copyBoard();
+      copy.placeSymbol(currentPlayer, move);
+      const score = minimax(copy, currentPlayer === "X" ? "O" : "X").score
+      return { score, move };
     })
-    const randomIdx = Math.floor(Math.random() * possibilities.length);
-    return possibilities[randomIdx];
+
+    results.sort((a, b) => a.score - b.score);
+    if (currentPlayer === playerSymbol) {
+      return results.at(0);
+    } else {
+      return results.at(-1);
+    }
   }
 
   return { getSymbol, getName, setName, getAutomatedMove };
