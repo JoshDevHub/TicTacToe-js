@@ -16,18 +16,22 @@ const pubSub = (() => {
 })();
 
 // factory for tic tac toe board
-const GameBoard = () => {
+const GameBoard = (cellData) => {
   const SIZE = 3;
 
-  const data = Array(SIZE).fill(null).map(() => Array(SIZE).fill(""));
+  const data = cellData ?? Array(SIZE).fill(null).map(() => Array(SIZE).fill(""));
 
-  const getData = () => [...data];
+  const getData = () => [...data.map((row) => [...row])];
 
-  const getPosition = (position) => {
-    const [row, col] = position;
-    if (isInvalidPosition(row, col)) return;
+  const copyBoard = () => GameBoard(getData());
 
-    return data[row][col];
+  const getEmptyPositions = () => {
+    return data.reduce((positionsList, row, rowIdx) => {
+      row.forEach((position, colIdx) => {
+        if (position === "") positionsList.push([rowIdx, colIdx])
+      })
+      return positionsList;
+    }, [])
   }
 
   const isPositionAvailable = (position) => {
@@ -46,12 +50,13 @@ const GameBoard = () => {
     }
   }
 
-  const hasThreeInRow = () => {
+  const hasThreeInRow = (symbol = null) => {
+    if (!symbol) {
+      return hasThreeInRow("X") || hasThreeInRow("O");
+    }
+
     const combinations = data.concat(columns(), diagonals());
-    return combinations.some((combo) => {
-      const [first, second, third] = combo;
-      return first && first === second && first === third;
-    })
+    return combinations.some((combo) => combo.every((square) => square === symbol));
   }
 
   const isFull = () => {
@@ -73,7 +78,10 @@ const GameBoard = () => {
     return [main, anti];
   }
 
-  return { getData, getPosition, placeSymbol, hasThreeInRow, isFull, isPositionAvailable };
+  return {
+    getData, getEmptyPositions, placeSymbol, hasThreeInRow,
+    isFull, isPositionAvailable, copyBoard
+  };
 };
 
 // Player Factory
