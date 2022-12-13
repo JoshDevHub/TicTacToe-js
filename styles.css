@@ -3,8 +3,8 @@
 }
 
 :root {
-  --background-left-gradient: #5DE6DE;
-  --background-right-gradient: #B58ECC;
+  --background-left-gradient: hsl(176, 73%, 63%);
+  --background-right-gradient: hsl(278, 38%, 68%);
   --grid-color: hsla(220, 16%, 22%, 0.8);
   --x-color: hsl(225, 27%, 51%);
 }
@@ -50,6 +50,46 @@ form input {
 form button {
   font-size: 1rem;
   padding: 0.5em;
+}
+
+input[type="checkbox"].toggle {
+  left: -9000px;
+  opacity: 0;
+  position: absolute;
+  top: -9000px;
+}
+
+input[type="checkbox"].toggle + label {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-weight: bold;
+  position: relative;
+}
+
+input[type="checkbox"].toggle + label::after {
+  content: "";
+  width: 3em;
+  height: 1.5em;
+  background-color: #fff;
+  border-radius: 1.5em;
+  margin-left: .25em;
+}
+
+input[type="checkbox"].toggle + label::before {
+  content: "";
+  width: 1.3em;
+  height: 1.3em;
+  right: 1.5em;
+  background-color: hsl(278, 70%, 80%);
+  border-radius: 1em;
+  position: absolute;
+  transform: translateX(0%);
+}
+
+input[type="checkbox"].toggle:checked + label::before {
+  background-color: var(--background-left-gradient);
+  right: 0.1em;
 }
 
 .grid {
