@@ -92,6 +92,10 @@ input[type="checkbox"].toggle:checked + label::before {
   right: 0.1em;
 }
 
+button {
+  cursor: pointer;
+}
+
 .grid {
   display: flex;
   flex-direction: column;
@@ -171,15 +175,24 @@ input[type="checkbox"].toggle:checked + label::before {
 }
 
 .modal-box {
-  background-color: gray;
+  background-color: var(--grid-color);
+  color: #fff;
   border-radius: 5px;
+  font-size: 1.5rem;
   left: 50%;
-  min-width: 50%;
+  height: 304px;
+  min-width: 304px;
   padding: 3rem;
   position: fixed;
   text-align: center;
   transform: translateX(-50%);
   z-index: 100;
+}
+
+.modal-box button {
+  font-size: 1.125rem;
+  margin-top: 1rem;
+  padding: 0.5em;
 }
 
 .closed {
