@@ -137,7 +137,7 @@ const ComputerPlayer = (symbol) => {
 const TicTacToe = () => {
   let board = GameBoard();
   const player1 = HumanPlayer("X");
-  const player2 = ComputerPlayer("O");
+  let player2 = HumanPlayer("O");
   let currentPlayer = player1;
 
   const getCurrentSymbol = () => currentPlayer.getSymbol();
@@ -176,9 +176,14 @@ const TicTacToe = () => {
     pubSub.publish("gameUpdated", board.getData());
   }
 
-  const setupGame = (playerNames) => {
-    player1.setName(playerNames.player1);
-    player2.setName(playerNames.player2);
+  const setupGame = (playerData) => {
+    player1.setName(playerData.player1);
+
+    if (playerData.aiGame) {
+      player2 = ComputerPlayer("O");
+    } else {
+      player2.setName(playerData.player2);
+    }
     pubSub.publish("gameUpdated", board.getData());
   }
 
@@ -244,16 +249,24 @@ const Display = () => {
   }
 
   const renderPlayerSelect = () => {
-    const template = document.getElementById("name-form");
+    const template = document.getElementById("player-form");
     const clone = template.content.cloneNode(true);
+
+    const toggleButton = clone.querySelector(".toggle");
+    const player2Field = clone.querySelector(".player2");
+    toggleButton.addEventListener("click", () => {
+      player2Field.classList.toggle("closed");
+    })
 
     const button = clone.querySelector("button");
     button.addEventListener("click", () => {
       const form = document.body.querySelector("form");
       const player1 = document.getElementById("player1").value;
-      const player2 = document.getElementById("player2").value;
+
+      const aiGame = document.getElementById("computer").checked;
+      const player2 = aiGame ? "BeepBoop" : document.getElementById("player2").value;
       document.body.removeChild(form);
-      pubSub.publish("setupGame", { player1, player2 });
+      pubSub.publish("setupGame", { player1, player2, aiGame });
     })
     document.body.appendChild(clone);
   }
